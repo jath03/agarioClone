@@ -20,6 +20,7 @@ class PlayerSprite(Sprite):
         self.canvas = canvas
         self.endgame = False
         self.size = 50
+        self.inc = 0
         self.id = self.canvas.create_oval(350, 350, 400, 400, tag='User', fill=random.choice(colors))
         self.id2 = self.canvas.create_text(375, 375, text=nick, font=('Helvetica', 15), tag='User')
     def coords(self):
@@ -42,8 +43,8 @@ class PlayerSprite(Sprite):
         self.canvas.quit()
         self.canvas.destroy()
     def collision(self, object):
-        x, y = self.coords()
         for obj in object:
+            x, y = self.coords()
             fx, fy = obj.coords()
             if fx is not None and fy is not None:
                 if ((fx - x)**2 + (fy-y)**2) <= (5 + (self.size/2))**2:
@@ -52,7 +53,8 @@ class PlayerSprite(Sprite):
                     pass
             else:
                 continue
-    def updateSize(self, increment=1):
+    def updateSize(self, increment=.4):
+        self.inc = increment
         x1, y1, x2, y2 = self.canvas.coords(self.id)
         self.canvas.coords(self.id, x1-(increment/2), y1-(increment/2), x2+(increment/2), y2+(increment/2))
 
@@ -69,7 +71,7 @@ class FoodSprite(Sprite):
         return randomx1, randomy1
     def getEaten(self):
         self.canvas.delete(self.id)
-        player.size += 1
+        player.size += player.inc
         player.updateSize()
         print(player.size)
     def coords(self):
@@ -96,14 +98,17 @@ player = PlayerSprite(canvas)
 player.mouseCoords()
 
 canvas.bind_all('<Control-c>', player.end)
-
+count = 0
 while player.endgame == False:
     try:
         player.moveTowardMouse()
         player.mouseCoords()
         player.collision(foods)
-        food = FoodSprite(canvas)
-        foods.append(food)
+        if count >= 10:
+            food = FoodSprite(canvas)
+            foods.append(food)
+            count = 0
+        count += 1
         tk.update_idletasks()
         tk.update()
         time.sleep(.01)
