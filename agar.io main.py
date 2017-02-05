@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import simpledialog
 import time, random, numpy, math
 
-
+#Mom was here
 
 class Sprite:
     def __init__(self, canvas):
